@@ -1,10 +1,18 @@
 const Discord = require("discord.js");
-const axios = require("axios");
+const sqlite3 = require("sqlite3").verbose();
 const config = require("./yenga-config.json");
-
-const matchDetails = require("./embeds/match");
+const commands = require("./commands");
 
 const client = new Discord.Client();
+
+let db = new sqlite3.Database(config.sqlite3, sqlite3.OPEN_READWRITE , err => {
+	if (err) {
+		console.log("Unable to open a connection to the database.");
+		return;
+	}
+
+	console.log("Connected to the database.");
+});
 
 client.on("ready", () => {
 	const guilds = client.guilds.array();
@@ -33,25 +41,16 @@ async function handleMessage(message) {
 	}
 
 	if (command === "lm" || command === "lastmatch") {
-		const data = await fetchLastMatchForPlayer("133268862");
-		message.channel.send({
-			embed: matchDetails(message.author, data[0])
-		});
+		commands.lastMatch(db, message);
+	}
+
+	if (command === "registerDota" || command === "regd") {
+		commands.registerDota(db, message, args[0]);
 	}
 }
 
 function messageStartsWithPrefix(prefix, message) {
 	return message.content.indexOf(prefix) === 0;
-}
-
-async function fetchLastMatchForPlayer(playerID) {
-	try {
-		const response = await axios.get(`https://api.opendota.com/api/players/${playerID}/recentmatches`);
-		return response.data;
-	} catch (error) {
-		console.log(error);
-		return null;
-	}
 }
 
 client.login(config.token);

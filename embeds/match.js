@@ -12,21 +12,22 @@ function matchEmbed(user, matchDetails) {
 	const playerFaction = playerSlotBits.charAt(0);
 	const duration = `${Math.floor(matchDetails.duration / 60)}:${("00" + matchDetails.duration % 60).substr(-2, 2)}`;
 	const matchEnd = matchDetails.start_time + matchDetails.duration;
+	const icon = `https://api.opendota.com${heroes[matchDetails.hero_id].icon}`;
 
 	return {
 		title: `${user.username} ${getWonLostString(matchDetails.radiant_win, playerFaction)} a game as ${heroes[matchDetails.hero_id].localized_name} ${moment(matchEnd, "X").fromNow()}.`,
 		description: `[Dotabuff](${dotabuffLink}) | [OpenDota](${opendotaLink})`,
+		color: 4289797,
+		thumbnail: { 
+			url: icon
+		},
 		fields: [{
 			name: duration,
-			value: getFactionString(playerFaction),
+			value: getKDAString(matchDetails),
 			inline: true
 		}, {
 			name: gameModes[matchDetails.game_mode],
 			value: lobbies[matchDetails.lobby_type],
-			inline: true
-		}, {
-			name: getKDAString(matchDetails),
-			value: getGPMXPMString(matchDetails),
 			inline: true
 		}]
 	};
@@ -40,10 +41,6 @@ function padTo8Bits(binaryValue) {
 	return binaryValue.padStart(8, "0");
 }
 
-function getFactionString(faction) {
-	return faction === '0' ? "Radiant" : "Dire";
-}
-
 function getWonLostString(radiantWin, playerFaction) {
 	const didPlayerWin = ((radiantWin && (playerFaction === '0')) || (!radiantWin && (playerFaction === '1')));
 
@@ -51,7 +48,7 @@ function getWonLostString(radiantWin, playerFaction) {
 }
 
 function getKDAString(matchDetails) {
-	return ` :crossed_swords: ${matchDetails.kills} :skull_crossbones: ${matchDetails.deaths} :handshake: ${matchDetails.assists}`;
+	return ` ${matchDetails.kills} K · ${matchDetails.deaths} D · ${matchDetails.assists} A`;
 }
 
 function getGPMXPMString(matchDetails) {
