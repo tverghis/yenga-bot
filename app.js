@@ -41,7 +41,7 @@ async function handleMessage(message) {
 	}
 
 	if (command === "lm" || command === "lastmatch") {
-		commands.lastMatch(db, message);
+		commands.lastMatch(db, client, message, args);
 	}
 
 	if (command === "registerDota" || command === "regd") {
