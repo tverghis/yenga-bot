@@ -1,21 +1,10 @@
 const axios = require("axios");
 const matchDetails = require("../embeds/match");
 
-async function sendLastMatchDetailsForUser(db, client, message, args) {
-	let userID;
-	let isRequestForMessageAuthor = true;
-	let userForMatch;
+async function sendLastMatchDetailsForUser(db, client, message, userForMatch) {
+	let isRequestForMessageAuthor = (message.author.id === userForMatch.id);
 
-	if (args && args.length > 0) {
-		userID = args[0].slice(2, args[0].length - 1);
-		isRequestForMessageAuthor = false;
-	} else {
-		userID = message.author.id;
-	}
-
-	userForMatch = await client.fetchUser(userID);
-
-	db.get(`SELECT steam_id from users WHERE discord_id = ${userID}`, [], async (err, row) => {
+	db.get(`SELECT steam_id from users WHERE discord_id = ${userForMatch.id}`, [], async (err, row) => {
 		if (!row || !row.steam_id) {
 			let failureMessage;
 

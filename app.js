@@ -41,7 +41,8 @@ async function handleMessage(message) {
 	}
 
 	if (command === "lm" || command === "lastmatch") {
-		commands.lastMatch(db, client, message, args);
+		let userForMatch = message.mentions.users.first() || message.author;
+		commands.lastMatch(db, client, message, userForMatch);
 	}
 
 	if (command === "registerDota" || command === "regd") {
